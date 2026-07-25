@@ -32,6 +32,7 @@ to create stronger and safer credentials.
 
 ## Project Structure
 ErrorLover-Shield/
+
     ├── app/
     │ ├── analyzer.py
     │ ├── entropy.py

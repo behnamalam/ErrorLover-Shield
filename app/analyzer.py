@@ -1,40 +1,55 @@
 import math
+
 from .rules import *
+from .score import ScoreEngine
+
 
 
 class PasswordAnalyzer:
 
     def __init__(self, password):
+
         self.password = password
-        self.score = 0
+
+        self.engine = ScoreEngine()
+
         self.problems = []
         self.suggestions = []
+
 
 
     def calculate_entropy(self):
 
         pool = 0
 
+
         if has_lower(self.password):
             pool += 26
+
 
         if has_upper(self.password):
             pool += 26
 
+
         if has_digit(self.password):
             pool += 10
 
+
         if has_symbol(self.password):
             pool += 32
+
 
 
         if pool == 0:
             return 0
 
 
+
         entropy = len(self.password) * math.log2(pool)
 
-        return round(entropy,2)
+
+        return round(entropy, 2)
+
 
 
 
@@ -43,47 +58,101 @@ class PasswordAnalyzer:
         password = self.password
 
 
+
         # Length
 
         if len(password) >= 16:
-            self.score += 25
+
+            self.engine.add(
+                25,
+                "Excellent password length"
+            )
+
 
         elif len(password) >= 12:
-            self.score += 20
+
+            self.engine.add(
+                20,
+                "Good password length"
+            )
+
 
         elif len(password) >= 8:
-            self.score += 10
+
+            self.engine.add(
+                10,
+                "Acceptable password length"
+            )
+
 
         else:
+
             self.problems.append(
                 "Password is too short"
             )
 
+            self.suggestions.append(
+                "Use at least 12 characters"
+            )
 
-        # Characters
+
+
+
+        # Character types
 
         checks = [
-            (has_upper(password),
-             "Add uppercase letters"),
 
-            (has_lower(password),
-             "Add lowercase letters"),
+            (
+                has_upper(password),
+                10,
+                "Contains uppercase letters",
+                "Add uppercase letters"
+            ),
 
-            (has_digit(password),
-             "Add numbers"),
 
-            (has_symbol(password),
-             "Add special characters")
+            (
+                has_lower(password),
+                10,
+                "Contains lowercase letters",
+                "Add lowercase letters"
+            ),
+
+
+            (
+                has_digit(password),
+                10,
+                "Contains numbers",
+                "Add numbers"
+            ),
+
+
+            (
+                has_symbol(password),
+                10,
+                "Contains special characters",
+                "Add special characters"
+            )
+
         ]
 
 
-        for result, suggestion in checks:
+
+        for result, score, good, bad in checks:
+
 
             if result:
-                self.score += 10
+
+                self.engine.add(
+                    score,
+                    good
+                )
 
             else:
-                self.suggestions.append(suggestion)
+
+                self.suggestions.append(
+                    bad
+                )
+
 
 
 
@@ -91,19 +160,30 @@ class PasswordAnalyzer:
 
         if password.lower() in common_passwords:
 
-            self.score -= 40
+
+            self.engine.remove(
+                40,
+                "Password found in leaked database"
+            )
+
 
             self.problems.append(
-                "Password exists in leaked password database"
+                "Password is commonly used"
             )
 
 
 
-        # Patterns
+
+        # Repeated characters
 
         if has_repeated_chars(password):
 
-            self.score -= 20
+
+            self.engine.remove(
+                20,
+                "Repeated characters detected"
+            )
+
 
             self.problems.append(
                 "Repeated characters detected"
@@ -111,43 +191,47 @@ class PasswordAnalyzer:
 
 
 
+
+        # Sequential patterns
+
         if has_sequential_pattern(password):
 
-            self.score -= 20
+
+            self.engine.remove(
+                20,
+                "Sequential pattern detected"
+            )
+
 
             self.problems.append(
                 "Sequential pattern detected"
             )
 
 
-        self.score = max(0,min(100,self.score))
 
 
         return self.result()
 
 
 
+
     def result(self):
 
-        if self.score < 30:
-            level = "Very Weak"
-
-        elif self.score < 60:
-            level = "Weak"
-
-        elif self.score < 80:
-            level = "Strong"
-
-        else:
-            level = "Very Strong"
+        score_data = self.engine.get_score()
 
 
         return {
 
-            "score": self.score,
-            "level": level,
+            "score": score_data["score"],
+
+            "level": score_data["level"],
+
+            "details": score_data["details"],
+
             "entropy": self.calculate_entropy(),
+
             "problems": self.problems,
+
             "suggestions": self.suggestions
 
         }

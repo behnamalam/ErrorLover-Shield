@@ -4,7 +4,7 @@ from app.analyzer import PasswordAnalyzer
 def load_passwords():
 
     with open(
-        "common_passwords.txt",
+        "database/common_passwords.txt",
         "r"
     ) as file:
 
@@ -52,6 +52,19 @@ print(
 print(
     f"Entropy: {result['entropy']} bits"
 )
+
+
+if result["details"]:
+
+    print("\nScore Details:")
+
+    for item in result["details"]:
+
+        sign = "+" if item["value"] > 0 else ""
+
+        print(
+            f"{sign}{item['value']} : {item['reason']}"
+        )
 
 
 if result["problems"]:

@@ -32,23 +32,24 @@ to create stronger and safer credentials.
 
 ## Project Structure
 ErrorLover-Shield/
-
+    │
     ├── app/
-    │ ├── analyzer.py
-    │ ├── entropy.py
-    │ ├── crack_time.py
-    │ └── rules.py
+    │   ├── analyzer.py          # Core password analysis engine
+    │   ├── entropy.py            # Entropy calculation
+    │   ├── crack_time.py         # Crack time estimation logic
+    │   ├── rules.py              # Password security rules
+    │   └── score.py              # Password scoring system
     │
     ├── database/
-    │ └── common_passwords.txt
+    │   └── common_passwords.txt  # Common leaked passwords database
     │
     ├── tests/
+    │   └── test_analyzer.py      # Unit tests
     │
-    ├── main.py
+    ├── main.py                   # CLI entry point
     ├── README.md
     ├── requirements.txt
     └── LICENSE
-
 
 
 ## Technologies

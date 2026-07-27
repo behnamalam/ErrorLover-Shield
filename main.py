@@ -5,14 +5,25 @@ def load_passwords():
 
     with open(
         "database/common_passwords.txt",
-        "r"
+        "r",
+        encoding="utf-8"
     ) as file:
 
         return [
             x.strip()
             for x in file.readlines()
         ]
+def load_names():
 
+    with open(
+        "database/first_names.txt",
+        encoding="utf-8"
+    ) as file:
+
+        return set(
+            x.strip().lower()
+            for x in file
+        )
 
 print("""
 =========================
@@ -51,6 +62,10 @@ print(
 
 print(
     f"Entropy: {result['entropy']} bits"
+)
+
+print(
+    f"Crack Time: {result['crack_time']}"
 )
 
 
